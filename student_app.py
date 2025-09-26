@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
@@ -30,14 +29,17 @@ st.header("🔎 Exploratory Data Analysis (EDA)")
 
 plot_type = st.selectbox(
     "Choose a Plot",
-    ["Scatter Plot", "Histogram", "Boxplot", "Correlation Heatmap", "Pairplot"]
+    ["Scatter Plot", "Histogram", "Boxplot", "Correlation Heatmap"]
 )
 
 if plot_type == "Scatter Plot":
     x_axis = st.selectbox("X-axis", data.columns, index=0)
     y_axis = st.selectbox("Y-axis", data.columns, index=len(data.columns) - 1)
     fig, ax = plt.subplots()
-    sns.scatterplot(x=x_axis, y=y_axis, data=data, ax=ax, s=70, color="blue")
+    ax.scatter(data[x_axis], data[y_axis], color="blue")
+    ax.set_xlabel(x_axis)
+    ax.set_ylabel(y_axis)
+    ax.set_title(f"{x_axis} vs {y_axis}")
     st.pyplot(fig)
 
 elif plot_type == "Histogram":
@@ -50,19 +52,15 @@ elif plot_type == "Histogram":
 elif plot_type == "Boxplot":
     column = st.selectbox("Select Column", data.columns, index=len(data.columns) - 1)
     fig, ax = plt.subplots()
-    sns.boxplot(x=data[column], ax=ax, color="orange")
+    ax.boxplot(data[column], vert=False)
     ax.set_title(f"Boxplot of {column}")
     st.pyplot(fig)
 
 elif plot_type == "Correlation Heatmap":
     fig, ax = plt.subplots()
-    sns.heatmap(data.corr(numeric_only=True), annot=True, cmap="coolwarm", ax=ax)
+    cax = ax.matshow(data.corr(numeric_only=True), cmap="coolwarm")
+    fig.colorbar(cax)
     ax.set_title("Correlation Heatmap")
-    st.pyplot(fig)
-
-elif plot_type == "Pairplot":
-    st.info("⚠ Pairplot may take a little time for larger datasets.")
-    fig = sns.pairplot(data)
     st.pyplot(fig)
 
 # -------------------------------
@@ -101,6 +99,8 @@ if st.button("Predict"):
     })
     prediction = rf.predict(new_student)[0]
     st.success(f"✅ Predicted Marks: {round(prediction, 2)}")
+
+
 
 
 
